@@ -35,6 +35,9 @@ def runFacialRecognition():
 	time.sleep(5)
 	while os.path.getsize("output.mtx") == 0:
 		time.sleep(.1)
+	f = open('output.mtx','r')
+	print f.read()
+	f.close()
 	p = subprocess.Popen(['ps', '-A'],stdout=subprocess.PIPE)
 	out, err = p.communicate()
 	for line in out.splitlines():
