@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <vector>
+#include <ctime>
+#include <sstream>
+#include <string>
+
+
 int main(int argc, char *argv[])
 {
 		
@@ -30,7 +35,8 @@ int main(int argc, char *argv[])
                 if(strstr(s,".gal") != NULL){
 			char base[] = "gals/";
 			strcat(base,s);
-			const char *  destPtr = (const char *)s;
+			const char *  destPtr = (const char *)base;
+			//printf("%s\n",destPtr);
 			br::File file(destPtr);
 			br::TemplateList n = br::TemplateList::fromGallery(file);
 			target.append(n);
@@ -41,15 +47,37 @@ int main(int argc, char *argv[])
 	br::Globals->enrollAll = false;
 	query >> *transform;
 	QList<float> scores = distance->compare(target,query);
-
+	int highest = -1;
 	for (int i = 0; i < scores.count(); ++i){
 
-		printf("Images %s and %s have a match score of %.3f\n",
-			qPrintable(target[i].file.name),
-			qPrintable(query.file.name),
-			scores[i]);
+		printf(" %.3f\n",scores[i]);
+		if(scores[i] > highest){
+			highest = scores[i];
+		}
 	}
+	if(highest > 50){
+		printf("been here before");
+	}
+	else {
+		time_t t = time(0);
+		struct tm * now = localtime(&t);
+		int year = now->tm_year + 1900;
+		int mon = now->tm_mon + 1;
+		int day = now->tm_mday +1;
+		int hour= now->tm_hour;
+		int min = now->tm_min;
+		int sec = now->tm_sec;
+		std::string str = "";
+		std::ostringstream oss;
+		oss << "gals/" << mon << "" << day << "" << year << "" << hour << "" << min << "" << sec << ".gal";
+		std::string mys = oss.str();
+		QString qstr = QString::fromStdString(mys);	
+		br::File gallery(qstr);
+		br::File file("newimage.jpg");
+		br::Globals->setProperty("algorithm","FaceRecognition");
+		br::Enroll(file,gallery); 			
 		
+	}
 	br::Context::finalize();
 	return 0;
 }

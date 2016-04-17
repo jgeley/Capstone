@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I. -isystem /usr/local/include -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem /usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I.
+INCPATH       = -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I. -isystem /usr/local/include -isystem /usr/local/include/opencv -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem /usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I.
 LINK          = g++
 LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS) -L/usr/local/lib/ -lopencv_core -lopenbr -lQt5Widgets -lQt5Gui -lQt5Core -lGLESv2 -lpthread 
@@ -45,8 +45,10 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = main.cpp 
-OBJECTS       = main.o
+SOURCES       = pic.cpp \
+		compare.cpp 
+OBJECTS       = pic.o \
+		compare.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
@@ -102,7 +104,8 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
-		main.pro main.cpp
+		main.pro pic.cpp \
+		compare.cpp
 QMAKE_TARGET  = main
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = main
@@ -261,7 +264,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/main1.0.0 || mkdir -p .tmp/main1.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/main1.0.0/ && $(COPY_FILE) --parents main.cpp .tmp/main1.0.0/ && (cd `dirname .tmp/main1.0.0` && $(TAR) main1.0.0.tar main1.0.0 && $(COMPRESS) main1.0.0.tar) && $(MOVE) `dirname .tmp/main1.0.0`/main1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/main1.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/main1.0.0/ && $(COPY_FILE) --parents pic.cpp compare.cpp .tmp/main1.0.0/ && (cd `dirname .tmp/main1.0.0` && $(TAR) main1.0.0.tar main1.0.0 && $(COMPRESS) main1.0.0.tar) && $(MOVE) `dirname .tmp/main1.0.0`/main1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/main1.0.0
 
 
 clean:compiler_clean 
@@ -300,8 +303,11 @@ compiler_clean:
 
 ####### Compile
 
-main.o: main.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+pic.o: pic.cpp compare.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pic.o pic.cpp
+
+compare.o: compare.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o compare.o compare.cpp
 
 ####### Install
 
