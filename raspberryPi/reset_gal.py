@@ -10,8 +10,8 @@ br = init_brpy()
 br.br_initialize(0,[],use_gui='true')
 br.br_set_property('algorithm','FaceRecognition')
 br.br_set_property('enrollAll','true')
-br.br_enroll('images','meds.gal')
-#gal = br.br_make_gallery('images')
+br.br_enroll('images','gals/meds.gal')
+#gal = br.br_make_gallery('images/james3.jpg')
 #targets = br.br_enroll_template(gal)
 
 #fileToComp = 'newimage.jpg'
