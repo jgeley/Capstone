@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 		if(thing.file.contains("Confidence")){
 			float confidence = thing.file.get<float>("Confidence");
 			if(confidence > 0.0) {
-				//cv::imwrite("temp.jpg",thing.m());
+				cv::imwrite("temp.jpg",thing.m());
 				//std::string tempstr = "images/temp.jpg";
 				//compare(argc,argv,tempstr.c_str());
 			} else{
