@@ -1,3 +1,4 @@
+#include <iostream>
 #include <openbr/openbr.h>
 #include <openbr/openbr_plugin.h>
 #include <stdio.h>
@@ -8,9 +9,9 @@
 #include <string>
 
 
-int compare(int argc, char *argv[], const char *tmpfile)
+int compare(int argc, char *argv[], char const *tempfile)
 {
-		
+	printf("%s\n",tempfile);		
 	br::Context::initialize(argc,argv,"",true);
 	std::vector<std::string> mylist;
 	mylist.clear();	
@@ -36,29 +37,30 @@ int compare(int argc, char *argv[], const char *tmpfile)
 			char base[] = "gals/";
 			strcat(base,s);
 			const char *  destPtr = (const char *)base;
-			printf("%s\n",destPtr);
+			//printf("%s\n",destPtr);
 			br::File file(destPtr);
 			br::TemplateList n = br::TemplateList::fromGallery(file);
 			target.append(n);
 
 		}
 	}
-	br::Template query(tmpfile);
+	br::Template query(tempfile);
 	br::Globals->enrollAll = false;
 	query >> *transform;
 	QList<float> scores = distance->compare(target,query);
 	int highest = -1;
 	for (int i = 0; i < scores.count(); ++i){
 
-		printf(" %.3f\n",scores[i]);
+		printf("%s and %s score:  %.3f\n",qPrintable(target[i].file.name),qPrintable(query.file.name),scores[i]);
 		if(scores[i] > highest){
 			highest = scores[i];
 		}
 	}
-	if(highest > 50){
-		printf("been here before");
+	if(highest > 3){
+		std::cout << "You have been here before";
 	}
 	else {
+		std::cout << "You are new here, your picture will be added to our database";
 		time_t t = time(0);
 		struct tm * now = localtime(&t);
 		int year = now->tm_year + 1900;
@@ -73,7 +75,7 @@ int compare(int argc, char *argv[], const char *tmpfile)
 		std::string mys = oss.str();
 		QString qstr = QString::fromStdString(mys);	
 		br::File gallery(qstr);
-		br::File file("newimage.jpg");
+		br::File file(tempfile);
 		br::Globals->setProperty("algorithm","FaceRecognition");
 		br::Enroll(file,gallery); 			
 		

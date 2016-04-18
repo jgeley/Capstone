@@ -7,6 +7,4 @@ LIBS += -L/usr/local/lib/ -lopencv_core \
 	-L/usr/local/lib/ -lopencv_highgui \
 	-L/usr/local/lib/ -lopencv_imgproc 
 SOURCES += \
-	compare.cpp
-SOURCES +=  \
-	runner.cpp
+	pic.cpp
