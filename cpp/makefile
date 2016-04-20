@@ -7,3 +7,7 @@ main.o : main.cpp
 
 main : main.o
 	g++ -Wall -g `pkg-config --cflags --libs Qt5Widgets opencv` -fPIC -I/include -L$(openbr_loc)/lib -lopenbr main.o -o main
+
+clean :
+	rm main
+	rm main.o

@@ -1,6 +1,7 @@
 #include <openbr/openbr_plugin.h>
 #include <iostream>
 #include <cv.h>
+#include <opencv2/core/core.hpp>
 #include <highgui.h>
 #include <unistd.h>
 
@@ -10,17 +11,23 @@ int main(int argc, char* argv[])
 {
     br::Context::initialize(argc, argv);
     QSharedPointer<br::Transform> transform = br::Transform::fromAlgorithm("FaceRecognition");
-    QSharedPointer<br::Distance> distance = br::Distance::fromAlgorithm("FaceRecognition");
+    QSharedPointer<br::Transform> ageTransform = br::Transform::fromAlgorithm("AgeEstimation");
+//    QSharedPointer<br::Distance> distance = br::Distance::fromAlgorithm("FaceRecognition");
 
     cout<< endl << "STARTING"<<endl ;
     cout<< flush ;
+
 
     while (true) {
         string input;
         cin >> input;
         if ( input.compare("CAPTURE") == 0 ){
-            br::Template thing("0.webcam");
+            char source[255];
+            cin >> source;
+            br::Template thing(source);
+            br::Template age = thing.clone();
             thing >> *transform;
+            age >> *ageTransform;
 
             //cv::imwrite("output.jpg",thing.m());
             //cout<<thing.m()<<endl;
@@ -32,6 +39,12 @@ int main(int argc, char* argv[])
                     QList<QPointF> points = thing.file.points();
                     QList<QRectF> rects = thing.file.rects();
                     cout << "FACE "<<points.length()<<" "<<rects.length()<<endl;
+                    cout << age.file.flat().toStdString() <<endl;
+                    /*cv::Mat matrix = thing.m();
+                    for(cv::MatConstIterator_<double> it = matrix.begin<double>();it != matrix.end<double>();it++) {
+                        cout << *it << " ";
+                    }
+                    cout << endl;*/
                     for(int i=0;i<points.length();i++) {
                         cout << points[i].x() << " " << points[i].y() << endl;
                     }
