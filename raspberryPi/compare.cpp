@@ -1,5 +1,4 @@
 #include <iostream>
-#include <openbr/openbr.h>
 #include <openbr/openbr_plugin.h>
 #include <stdio.h>
 #include <dirent.h>

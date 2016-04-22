@@ -26,7 +26,7 @@ while run :
         proc.stdin.flush()
         screen.fill((0,0,0))
         fl = proc.stdout.readline().strip().split()
-        if fl[0] == "FACE" :
+	if fl[0] == "FACE" :
             np = int(fl[1])
             nr = int(fl[2])
             print(proc.stdout.readline())
