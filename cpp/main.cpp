@@ -38,57 +38,65 @@ int main(int argc, char* argv[])
 				float confidence = thing.file.get<float>("Confidence");
 				if( confidence > 0.0 ){
 
-					//// get list of all existing template file names in the templates directory
-					//std::vector<std::string> templateList;
-					//templateList.clear();
-					//DIR *d;
-					//struct dirent *dir;
-					//d = opendir("templates");
-					//if (d){
-					//	while((dir = readdir(d)) != NULL){
-					//		templateList.push_back(dir->d_name);
-					//	}
-					//	closedir(d);
-					//}
-					//
-					//// do compare
-					//bool foundmatch = false;
-					//br::Template result;
-					//for(unsigned int j = 0; j < templateList.size(); j++){
-					//	char *s = new char[templateList.at(j).length() + 1];
-					//	strcpy(s,templateList.at(j).c_str());
-					//	if(strstr(s,".tmpl") != NULL){
-					//		// this is getting the file from the template directory
-					//		//cout  << templateList[j].c_str() << "\n\n\n\n\n";
-					//		char base[] = "templates/";
-					//		strcat(base,s);
-					//		const char * destPtr = (const char *)base;
-					//		QFile file(destPtr);
-					//		file.open(QIODevice::ReadOnly);
-					//		QDataStream in(&file);
-					//		br::Template templ;	
-					//		in >> templ;
-					//		float score = distance->compare(templ, thing);
-					//		if(score > 3){
-					//			result = templ.clone();
-					//			foundmatch = true;
-					//			//cout << "FOUND MATCH------------------------------------------------\n";
-					//		}
-					//		//cout << flush;
-					//	}
-					//}		
-					//
+					// get list of all existing template file names in the templates directory
+					std::vector<std::string> templateList;
+					templateList.clear();
+					DIR *d;
+					struct dirent *dir;
+					d = opendir("templates");
+					if (d){
+                        int count = 0;
+						while((dir = readdir(d)) != NULL){
+                            char* thing = (char*) malloc(strlen(dir->d_name)+1);
+                            strcpy(thing, dir->d_name);
+							templateList.push_back(string(thing));
+/*                            cerr << (void*)(dir->d_name) << endl;
+                            const char* thing = tmpstr.c_str();
+                            cerr << (void*)tmpstr.data() << endl;*/
+						}
+						closedir(d);
+					}
+					
+					// do compare
+					bool foundmatch = false;
+					br::Template result;
+					for(unsigned int j = 0; j<templateList.size(); j--){
+						//char *s = new char[templateList.at(j).length() + 1];
+                        templateList[j].c_str();
+                        string x = templateList.at(j);//strcpy(s,templateList.at(j).c_str());
+						const char *s = x.c_str();
+						if(strstr(s,".tmpl") != NULL){
+							// this is getting the file from the template directory
+							//cout  << templateList[j].c_str() << "\n\n\n\n\n";
+							char base[512] = "templates/";
+							strcat(base,s);
+							const char * destPtr = (const char *)base;
+							QFile file(destPtr);
+							file.open(QIODevice::ReadOnly);
+							QDataStream in(&file);
+							br::Template templ;	
+							in >> templ;
+							float score = distance->compare(templ, thing);
+							if(score > 3){
+								result = templ.clone();
+								foundmatch = true;
+								//cout << "FOUND MATCH------------------------------------------------\n";
+							}
+							//cout << flush;
+						}
+					}		
+					
 					// If a match is not found
-					//if(true){
-						//age >> *ageTransform;
-						//QString base = "templates/";
-						//base.append(thing.file.hash());
-						//base.append(".tmpl");
-						//cout << "going to open file " << qPrintable(thing.file.hash()) << " \n";
-						//QFile out(base);
-						//out.open(QIODevice::WriteOnly);
-						//QDataStream outstream(&out);
-						//outstream << thing;
+					if(true){
+						age >> *ageTransform;
+						QString base = "templates/";
+						base.append(thing.file.hash());
+						base.append(".tmpl");
+						cout << "going to open file " << qPrintable(thing.file.hash()) << " \n";
+						QFile out(base);
+						out.open(QIODevice::WriteOnly);
+						QDataStream outstream(&out);
+						outstream << thing;
 						QList<QPointF> points = thing.file.points();
 						QList<QRectF> rects = thing.file.rects();
 						cout << "FACE "<<points.length()<<" "<<rects.length()<<endl;
@@ -105,10 +113,9 @@ int main(int argc, char* argv[])
 							cout << rects[i].x() << " " << rects[i].y() << " ";
 							cout << rects[i].width() << " " << rects[i].height() << endl;
 						}
-					//}
-					//else {
-					//	// if a match is not found (increment)	
-					//}
+					} else {
+						// if a match is not found (increment)	
+					}
 				} else {
 					cout << "NOFACE" <<endl;
 				}
