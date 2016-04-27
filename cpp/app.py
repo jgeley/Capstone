@@ -4,6 +4,7 @@ import subprocess
 import time
 import pygame
 import traceback
+import math
 
 size = (800,800)
 
@@ -11,8 +12,26 @@ screen = pygame.display.set_mode(size)
 
 run = True
 
-proc = subprocess.Popen(["./main"],stdout=subprocess.PIPE,stdin=subprocess.PIPE)
 
+datadir = "outputImages"
+
+data = {}
+
+def get_norm_age(age):
+    if age < 5 :
+        return 5
+    if age > 80 :
+        return 80
+    return int(math.floor(age/5)*5)
+
+for gender in ["male","female"] :
+    data[gender] = {}
+    for age in range(5,85,5) :
+        data[gender][age] = pygame.image.load("/".join([datadir,gender,str(age),"image.jpg"]))
+
+data["male"][5].blit(screen,(0,0))
+
+proc = subprocess.Popen(["./main"],stdout=subprocess.PIPE,stdin=subprocess.PIPE)
 while proc.stdout.readline().strip() != "STARTING" :
     pass
 
@@ -26,8 +45,11 @@ while run :
         proc.stdin.flush()
         screen.fill((0,0,0))
         fl = proc.stdout.readline().strip().split()
-	print fl
-	#if fl[0] == "FACE" :
+	if fl[0] == "FACE" :
+            num = int(fl[1])
+            gender = fl[2].lower()
+            age = float(fl[3])
+            screen.blit(data[gender][get_norm_age(age)],(0,0))
             #np = int(fl[1])
             #nr = int(fl[2])
             #print(proc.stdout.readline())
@@ -38,7 +60,7 @@ while run :
             #for i in range(nr) :
             #    rect = tuple(map(lambda x : int(float(x)),proc.stdout.readline().strip().split()))
             #    pygame.draw.rect(screen,(100,100,100),rect,5)
-        #pygame.display.flip()
+        pygame.display.flip()
         print("FRAME")
     except Exception :
         traceback.print_exc()
