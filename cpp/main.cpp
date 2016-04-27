@@ -58,6 +58,8 @@ int main(int argc, char* argv[])
 					// do compare
 					bool foundmatch = false;
 					br::Template result;
+					float highest = -10;
+					const char * resultPtr;
 					for(unsigned int j = 0; j<templateList.size(); j--){
 						//char *s = new char[templateList.at(j).length() + 1];
 						templateList[j].c_str();
@@ -75,8 +77,10 @@ int main(int argc, char* argv[])
 							in >> templ;
 							float score = distance->compare(templ, thing);
 							//cout << score << " ";
-							if(score > 3){
+							if(score > 3 && score > highest){
 								result = templ.clone();
+								resultPtr = (const char *)base;
+								highest = score;
 								foundmatch = true;
 							}
 						}
@@ -116,12 +120,23 @@ int main(int argc, char* argv[])
 						}
 					} else {
 						int numTimes = result.file.get<int>("Times");
-						numTimes += 1;
+						result.file.remove("Times");
+						numTimes = numTimes + 1;
 						//cout << "num times " << numTimes << "\n";
 						//cout << result.file.flat().toStdString() << endl;
 						//cout << flush;
 						result.file.set("Times",QVariant::fromValue<int>(numTimes));
-						cout << "FACE "  << result.file.get<int>("Times") << " " << qPrintable(result.file.get<QString>("Gender")) << " " << result.file.get<float>("Age") << endl;
+						//cout << resultPtr << "\n";
+						//cout << flush;
+						QFile del(resultPtr);
+						del.remove();
+                                                QFile out(resultPtr);
+                                                out.open(QIODevice::WriteOnly);
+                                                QDataStream outstream(&out);
+                                                outstream << result;
+						//cout << result.file.flat().toStdString() << endl;
+						//cout << flush;
+						cout << "FACE "  << numTimes << " " << qPrintable(result.file.get<QString>("Gender")) << " " << result.file.get<float>("Age") << endl;
 						// if a match is not found (increment)	
 					}
 				} else {
