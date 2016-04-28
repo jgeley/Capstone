@@ -31,7 +31,7 @@ for gender in ["male","female"] :
 
 data["male"][5].blit(screen,(0,0))
 
-proc = subprocess.Popen(["./main"],stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+proc = subprocess.Popen(["./openBrMain"],stdout=subprocess.PIPE,stdin=subprocess.PIPE)
 while proc.stdout.readline().strip() != "STARTING" :
     pass
 

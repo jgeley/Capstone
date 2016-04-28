@@ -1,13 +1,20 @@
 openbr_loc= /home/mitchell/Applications/apps/local
 
-all : main
+all : openBrMain
 
-main.o : main.cpp
-	g++ -Wall -g -c `pkg-config --cflags --libs Qt5Widgets opencv`	-fPIC -I$(openbr_loc)/include main.cpp -o main.o
 
-main : main.o
-	g++ -Wall -g `pkg-config --cflags --libs Qt5Widgets opencv` -fPIC -I/include -L$(openbr_loc)/lib -lopenbr main.o -o main
+
+openBr.o : openBr.cpp
+	g++ -Wall -g -std=gnu++0x -c `pkg-config --cflags --libs Qt5Widgets opencv`  -fPIC -I$(openbr_loc)/include openBr.cpp -o openBr.o
+
+openBrMain.o : openBrMain.cpp openBr.o
+	g++ -Wall -g -std=gnu++0x -c `pkg-config --cflags --libs Qt5Widgets opencv`  -fPIC -I$(openbr_loc)/include openBrMain.cpp -o openBrMain.o
+
+openBrMain : openBr.o openBrMain.o 
+	g++ -Wall -std=gnu++0x -g `pkg-config --cflags --libs Qt5Widgets opencv` -fPIC -I/include -L$(openbr_loc)/lib -lopenbr openBrMain.o openBr.o -o openBrMain
+	
+
 
 clean :
-	rm main
-	rm main.o
+	rm openBr
+	rm openBr.o
