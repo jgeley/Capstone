@@ -6,7 +6,7 @@ import pygame
 import traceback
 import math
 
-size = (800,800)
+size = (800,680)
 
 screen = pygame.display.set_mode(size)
 
@@ -27,7 +27,7 @@ def get_norm_age(age):
 for gender in ["male","female"] :
     data[gender] = {}
     for age in range(5,85,5) :
-        data[gender][age] = pygame.image.load("/".join([datadir,gender,str(age),"image.jpg"]))
+        data[gender][age] = pygame.transform.scale(pygame.image.load("/".join([datadir,gender,str(age),"image.jpg"])),size)
 
 data["male"][5].blit(screen,(0,0))
 
