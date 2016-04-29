@@ -5,14 +5,28 @@ import time
 import pygame
 import traceback
 import math
+import os
+size = (752,448)
 
-size = (800,680)
+drivers = ['fbcon', 'directfb', 'svgalib', 'x11']
+found = False
+for driver in drivers:
+    # Make sure that SDL_VIDEODRIVER is set
+    if not os.getenv('SDL_VIDEODRIVER'):
+        os.putenv('SDL_VIDEODRIVER', driver)
+        try:
+            pygame.display.init()
+        except Exception:
+            print 'Driver: {0} failed.'.format(driver)
+            continue
+        found = True
+        break
+if not found:
+    raise Exception('No suitable video driver found!')
 
-screen = pygame.display.set_mode(size)
-
-run = True
-
-
+size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+#screen = pygame.display.set_mode(size)
 datadir = "outputImages"
 
 data = {}
@@ -35,7 +49,7 @@ proc = subprocess.Popen(["./openBrMain"],stdout=subprocess.PIPE,stdin=subprocess
 while proc.stdout.readline().strip() != "STARTING" :
     pass
 
-while run :
+while True :
     try :
         for event in pygame.event.get():
             if event.type == pygame.QUIT :
@@ -65,5 +79,13 @@ while run :
     except Exception :
         traceback.print_exc()
         break
+    if pygame.key.get_pressed()[pygame.K_ESCAPE] :
+        break
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            break
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                break
 
 proc.stdin.write("QUIT\n")
