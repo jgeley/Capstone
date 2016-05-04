@@ -10,6 +10,8 @@ size = (752,448)
 
 drivers = ['fbcon', 'directfb', 'svgalib', 'x11']
 found = False
+
+# finds driver for the current OS
 for driver in drivers:
     # Make sure that SDL_VIDEODRIVER is set
     if not os.getenv('SDL_VIDEODRIVER'):
@@ -24,13 +26,14 @@ for driver in drivers:
 if not found:
     raise Exception('No suitable video driver found!')
 
+#Initializes screen
 size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
 screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
-#screen = pygame.display.set_mode(size)
-datadir = "outputImages"
 
 data = {}
 
+# ALl ages are mod 5 with a min of 5 and max of 80
+# param age - the age to be normalized
 def get_norm_age(age):
     if age < 5 :
         return 5
@@ -38,6 +41,7 @@ def get_norm_age(age):
         return 80
     return int(math.floor(age/5)*5)
 
+#Tranforms all of the images to the correct size
 for gender in ["male","female"] :
     data[gender] = {}
     for age in range(5,85,5) :
@@ -45,35 +49,30 @@ for gender in ["male","female"] :
 
 data["male"][5].blit(screen,(0,0))
 
+#Opens the cpp process and waits for it to initialize
 proc = subprocess.Popen(["./openBrMain"],stdout=subprocess.PIPE,stdin=subprocess.PIPE)
 while proc.stdout.readline().strip() != "STARTING" :
     pass
 
+# While process does not output 
 while True :
     try :
+        # Allows pygame to exit
         for event in pygame.event.get():
             if event.type == pygame.QUIT :
                 run = False
+        # Tells the cpp code to use the webcam
         proc.stdin.write("CAPTURE\n")
         proc.stdin.write("0.webcam\n")
         proc.stdin.flush()
         screen.fill((0,0,0))
         fl = proc.stdout.readline().strip().split()
+        # If a face was found then put picture on screen
 	if fl[0] == "FACE" :
             num = int(fl[1])
             gender = fl[2].lower()
             age = float(fl[3])
             screen.blit(data[gender][get_norm_age(age)],(0,0))
-            #np = int(fl[1])
-            #nr = int(fl[2])
-            #print(proc.stdout.readline())
-            #print(list(map(float,proc.stdout.readline().strip().split())))
-            #for i in range(np) :
-            #    point = tuple(map(lambda x : int(float(x)),proc.stdout.readline().strip().split()))
-            #    pygame.draw.circle(screen,(255,255,255),point,5,2)
-            #for i in range(nr) :
-            #    rect = tuple(map(lambda x : int(float(x)),proc.stdout.readline().strip().split()))
-            #    pygame.draw.rect(screen,(100,100,100),rect,5)
         pygame.display.flip()
         print("FRAME")
     except Exception :
